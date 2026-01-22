@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -13,16 +16,23 @@
     flex-direction: column;
     height: 100vh;
     margin: 0;
-    background-color: #87ceeb; /* niebieskie tło */
+    background-color: #87ceeb;
     background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
-    background-size: 40px 40px; /* delikatny wzorek kostek w tle */
+    background-size: 40px 40px;
   }
 
   h1 {
-    margin-bottom: 20px;
+    margin-bottom: 5px;
     font-size: 2em;
     color: white;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  }
+
+  .sub-header {
+    font-size: 1.2em;
+    color: white;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
   }
 
   #controls {
@@ -36,54 +46,62 @@
   #diceContainer {
     display: flex;
     justify-content: center;
-    gap: 15px;
+    gap: 10px;
     flex-wrap: wrap;
+    margin-bottom: 20px;
   }
 
   .dice {
-    width: 100px;
-    height: 100px;
-    border: 5px solid white; /* grubsza biała obramówka */
+    width: 70px;
+    height: 70px;
+    border: 8px solid white;
     border-radius: 12px;
     position: relative;
     transition: transform 0.1s;
   }
 
-  /* Biała kropka na środku */
   .dice::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     background-color: white;
     border-radius: 50%;
     transform: translate(-50%, -50%);
   }
 
   .rolling {
-    background-color: #aaa; /* szare podczas rzutu */
+    background-color: #aaa;
     animation: shake 0.1s infinite;
   }
 
   @keyframes shake {
-    0% { transform: translate(1px, 1px) rotate(0deg); }
-    20% { transform: translate(-1px, -2px) rotate(-2deg); }
-    40% { transform: translate(-3px, 0px) rotate(3deg); }
-    60% { transform: translate(3px, 2px) rotate(0deg); }
-    80% { transform: translate(1px, -1px) rotate(1deg); }
-    100% { transform: translate(0px, 2px) rotate(-1deg); }
+    0% { transform: translate(1px,1px) rotate(0deg);}
+    20% { transform: translate(-1px,-2px) rotate(-2deg);}
+    40% { transform: translate(-3px,0px) rotate(3deg);}
+    60% { transform: translate(3px,2px) rotate(0deg);}
+    80% { transform: translate(1px,-1px) rotate(1deg);}
+    100% { transform: translate(0px,2px) rotate(-1deg);}
   }
 
-  button {
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1em;
-    border: none;
-    border-radius: 6px;
-    background-color: white;
+  #rollBtn {
+    width: 300px;
+    padding: 15px 0;
+    background-color: #FFD700;
+    color: white;
+    font-size: 1.5em;
     font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+  }
+
+  #rollBtn:active {
+    transform: scale(0.97);
   }
 
   select {
@@ -92,13 +110,19 @@
     border-radius: 6px;
     border: 1px solid #333;
   }
+
+  #controls label {
+    color: white;
+    font-size: 1em;
+  }
 </style>
 </head>
 <body>
 <h1>dice by okon</h1>
+<div class="sub-header">approved by: okon, julo, levi, stanley, kupson</div>
 
 <div id="controls">
-  <label for="diceCount" style="color:white;">Wybierz liczbę kostek:</label>
+  <label for="diceCount">Wybierz liczbę kostek:</label>
   <select id="diceCount">
     <option value="1">1</option>
     <option value="2">2</option>
@@ -107,10 +131,10 @@
     <option value="5">5</option>
     <option value="6">6</option>
   </select>
-  <button id="rollBtn">Rzuć!</button>
 </div>
 
 <div id="diceContainer"></div>
+<button id="rollBtn">ROLL</button>
 
 <script>
 const colors = ['red', 'blue', 'purple', 'green', 'yellow', 'orange'];
@@ -122,33 +146,39 @@ function getRandomColor() {
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
+// NOWA FUNKCJA: losowanie kostek z "odświeżeniem"
 function rollDice() {
   const count = parseInt(diceCountSelect.value);
+
+  // 1️⃣ Odświeżenie kostek (stan początkowy)
   diceContainer.innerHTML = '';
-
   const diceElements = [];
-
   for (let i = 0; i < count; i++) {
     const dice = document.createElement('div');
-    dice.className = 'dice rolling';
+    dice.className = 'dice rolling'; // szare i trzęsące się
     diceContainer.appendChild(dice);
     diceElements.push(dice);
   }
 
-  // Po 1 sekundzie zatrzymujemy kostki i ustawiamy kolor
+  // 2️⃣ Po 1 sekundzie ustawiamy losowe kolory (animacja rzutu)
   setTimeout(() => {
-    diceElements.forEach(dice => {
-      dice.classList.remove('rolling');
-      dice.style.backgroundColor = getRandomColor();
-      dice.style.transform = 'none';
+    diceElements.forEach(d => {
+      d.classList.remove('rolling');
+      d.style.backgroundColor = getRandomColor();
+      d.style.transform = 'none';
     });
   }, 1000);
 }
 
+// Event listener dla przycisku ROLL
 rollBtn.addEventListener('click', rollDice);
 
-// Rzut od razu przy starcie
+// NOWOŚĆ: automatyczne losowanie po zmianie liczby kostek
+diceCountSelect.addEventListener('change', rollDice);
+
+// Rzut przy starcie
 rollDice();
 </script>
 </body>
 </html>
+
