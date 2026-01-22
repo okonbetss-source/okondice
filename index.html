@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Dice</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+    background-color: #87ceeb; /* niebieskie tło */
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 40px 40px; /* delikatny wzorek kostek w tle */
+  }
+
+  h1 {
+    margin-bottom: 20px;
+    font-size: 2em;
+    color: white;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  }
+
+  #controls {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  #diceContainer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .dice {
+    width: 100px;
+    height: 100px;
+    border: 5px solid white; /* grubsza biała obramówka */
+    border-radius: 12px;
+    position: relative;
+    transition: transform 0.1s;
+  }
+
+  /* Biała kropka na środku */
+  .dice::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .rolling {
+    background-color: #aaa; /* szare podczas rzutu */
+    animation: shake 0.1s infinite;
+  }
+
+  @keyframes shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    20% { transform: translate(-1px, -2px) rotate(-2deg); }
+    40% { transform: translate(-3px, 0px) rotate(3deg); }
+    60% { transform: translate(3px, 2px) rotate(0deg); }
+    80% { transform: translate(1px, -1px) rotate(1deg); }
+    100% { transform: translate(0px, 2px) rotate(-1deg); }
+  }
+
+  button {
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    border: none;
+    border-radius: 6px;
+    background-color: white;
+    font-weight: bold;
+  }
+
+  select {
+    padding: 5px 10px;
+    font-size: 1em;
+    border-radius: 6px;
+    border: 1px solid #333;
+  }
+</style>
+</head>
+<body>
+<h1>dice by okon</h1>
+
+<div id="controls">
+  <label for="diceCount" style="color:white;">Wybierz liczbę kostek:</label>
+  <select id="diceCount">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3" selected>3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+  </select>
+  <button id="rollBtn">Rzuć!</button>
+</div>
+
+<div id="diceContainer"></div>
+
+<script>
+const colors = ['red', 'blue', 'purple', 'green', 'yellow', 'orange'];
+const rollBtn = document.getElementById('rollBtn');
+const diceContainer = document.getElementById('diceContainer');
+const diceCountSelect = document.getElementById('diceCount');
+
+function getRandomColor() {
+  return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function rollDice() {
+  const count = parseInt(diceCountSelect.value);
+  diceContainer.innerHTML = '';
+
+  const diceElements = [];
+
+  for (let i = 0; i < count; i++) {
+    const dice = document.createElement('div');
+    dice.className = 'dice rolling';
+    diceContainer.appendChild(dice);
+    diceElements.push(dice);
+  }
+
+  // Po 1 sekundzie zatrzymujemy kostki i ustawiamy kolor
+  setTimeout(() => {
+    diceElements.forEach(dice => {
+      dice.classList.remove('rolling');
+      dice.style.backgroundColor = getRandomColor();
+      dice.style.transform = 'none';
+    });
+  }, 1000);
+}
+
+rollBtn.addEventListener('click', rollDice);
+
+// Rzut od razu przy starcie
+rollDice();
+</script>
+</body>
+</html>
